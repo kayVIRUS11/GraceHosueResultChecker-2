@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { studentsForTeacher } from "@/lib/data";
+import { allSessions, studentsForTeacher } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Save, Send } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -14,16 +15,36 @@ import { useToast } from "@/hooks/use-toast";
 
 type Score = { test1: number | null, test2: number | null, test3: number | null, exam: number | null };
 
+// Store scores in a nested structure: { [sessionTermKey]: { [studentId]: Score } }
+type AllScores = Record<string, Record<number, Score>>;
+
 export default function TeacherScoresPage() {
-    const [scores, setScores] = useState<Record<number, Score>>(
-        studentsForTeacher.reduce((acc, student) => ({
-            ...acc,
-            [student.id]: { test1: null, test2: null, test3: null, exam: null }
-        }), {})
-    );
+    const [allScores, setAllScores] = useState<AllScores>({});
+    const [selectedSession, setSelectedSession] = useState<string | null>(null);
+    const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
+    const [selectedClass, setSelectedClass] = useState("jss3a");
+    const [selectedSubject, setSelectedSubject] = useState("math");
+
     const { toast } = useToast();
+    
+    const sessionTermKey = selectedSession && selectedTerm ? `${selectedSession}-${selectedTerm}` : null;
+
+    const scores = useMemo(() => {
+        if (!sessionTermKey) return {};
+        return allScores[sessionTermKey] || {};
+    }, [sessionTermKey, allScores]);
+
 
     const handleScoreChange = (studentId: number, field: keyof Score, value: string) => {
+        if (!sessionTermKey) {
+            toast({
+                title: "Selection Required",
+                description: "Please select a session and term first.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         const numericValue = value === '' ? null : parseInt(value, 10);
         
         const maxValues = {
@@ -42,15 +63,21 @@ export default function TeacherScoresPage() {
             return;
         }
 
-        setScores(prev => ({
-            ...prev,
-            [studentId]: {
-                ...prev[studentId],
-                [field]: isNaN(numericValue as number) ? null : numericValue
-            }
-        }));
+        setAllScores(prevAllScores => {
+            const newSessionScores = {
+                ...(prevAllScores[sessionTermKey] || {}),
+                [studentId]: {
+                    ...(prevAllScores[sessionTermKey]?.[studentId] || { test1: null, test2: null, test3: null, exam: null }),
+                    [field]: isNaN(numericValue as number) ? null : numericValue
+                }
+            };
+            return {
+                ...prevAllScores,
+                [sessionTermKey]: newSessionScores
+            };
+        });
     };
-
+    
     const studentData = useMemo(() => {
         return studentsForTeacher.map(student => {
             const studentScores = scores[student.id] || {};
@@ -64,22 +91,29 @@ export default function TeacherScoresPage() {
             else if (total >= 40) grade = 'D';
             else if (total > 0 || Object.values(studentScores).some(s => s !== null)) grade = 'F';
 
-
-            return {
-                ...student,
-                total: isNaN(total) ? 0 : total,
-                grade
-            };
+            return { ...student, total, grade };
         });
     }, [scores]);
     
     const handleSaveDraft = () => {
-        toast({ title: "Draft Saved", description: "Your scores have been saved as a draft." });
+        if (!sessionTermKey) return;
+        console.log("Saving draft for", sessionTermKey, scores);
+        toast({ title: "Draft Saved", description: `Scores for ${selectedTerm}, ${selectedSession} have been saved as a draft.` });
     };
 
     const handleSubmitScores = () => {
-        toast({ title: "Scores Submitted", description: "Final scores have been successfully submitted." });
+        if (!sessionTermKey) return;
+        console.log("Submitting scores for", sessionTermKey, scores);
+        toast({ title: "Scores Submitted", description: `Final scores for ${selectedTerm}, ${selectedSession} have been submitted.` });
     };
+
+    const availableTerms = useMemo(() => {
+        if (!selectedSession) return [];
+        return [...new Set(allSessions.filter(s => s.name === selectedSession).map(s => s.term))];
+    }, [selectedSession]);
+    
+    const uniqueSessions = [...new Set(allSessions.map(s => s.name))];
+
 
   return (
     <>
@@ -93,10 +127,30 @@ export default function TeacherScoresPage() {
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div>
                         <CardTitle className="font-headline">Class Scores</CardTitle>
-                        <CardDescription>Select a class and subject to begin.</CardDescription>
+                        <CardDescription>Select a session, term, class, and subject to begin.</CardDescription>
                     </div>
-                    <div className="flex gap-4 w-full md:w-auto">
-                        <Select defaultValue="jss3a">
+                    <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                        <Select onValueChange={setSelectedSession}>
+                            <SelectTrigger className="w-full md:w-[180px]">
+                                <SelectValue placeholder="Select Session" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {uniqueSessions.map(sessionName => (
+                                    <SelectItem key={sessionName} value={sessionName}>{sessionName}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select onValueChange={setSelectedTerm} disabled={!selectedSession}>
+                            <SelectTrigger className="w-full md:w-[180px]">
+                                <SelectValue placeholder="Select Term" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableTerms.map(term => (
+                                    <SelectItem key={term} value={term}>{term}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select value={selectedClass} onValueChange={setSelectedClass}>
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Select Class" />
                             </SelectTrigger>
@@ -105,7 +159,7 @@ export default function TeacherScoresPage() {
                                 <SelectItem value="jss3b">JSS 3B</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Select defaultValue="math">
+                        <Select value={selectedSubject} onValueChange={setSelectedSubject}>
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Select Subject" />
                             </SelectTrigger>
@@ -146,6 +200,7 @@ export default function TeacherScoresPage() {
                                             onChange={(e) => handleScoreChange(student.id, field, e.target.value)}
                                             max={field === 'exam' ? 40 : 20}
                                             min={0}
+                                            disabled={!sessionTermKey}
                                         />
                                     </TableCell>
                                 ))}
@@ -158,11 +213,11 @@ export default function TeacherScoresPage() {
             </CardContent>
         </Card>
         <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={handleSaveDraft}>
+            <Button variant="outline" onClick={handleSaveDraft} disabled={!sessionTermKey}>
                 <Save className="mr-2 h-4 w-4" />
                 Save Draft
             </Button>
-            <Button onClick={handleSubmitScores}>
+            <Button onClick={handleSubmitScores} disabled={!sessionTermKey}>
                 <Send className="mr-2 h-4 w-4" />
                 Submit Final Scores
             </Button>
@@ -171,3 +226,5 @@ export default function TeacherScoresPage() {
     </>
   );
 }
+
+    

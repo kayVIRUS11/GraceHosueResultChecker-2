@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { allStudents, currentResults } from "@/lib/data";
+import { allStudents, currentResults, allSessions } from "@/lib/data";
 import { Download, Printer } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -21,7 +22,9 @@ const getGrade = (total: number) => {
 
 export default function TeacherBroadsheetPage() {
     const [selectedClass, setSelectedClass] = useState("jss3");
-    
+    const [selectedSession, setSelectedSession] = useState<string | null>(null);
+    const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
+
     const broadsheetData = useMemo(() => {
         const classMap: Record<string, string> = {
             "jss1": "JSS 1",
@@ -35,6 +38,7 @@ export default function TeacherBroadsheetPage() {
             let totalScore = 0;
             
             subjects.forEach(subject => {
+                // This logic should be replaced with actual data fetching based on session/term
                 const score = Math.floor(Math.random() * 61) + 40; // Random score between 40 and 100
                 studentScores[subject] = score;
                 totalScore += score;
@@ -51,11 +55,17 @@ export default function TeacherBroadsheetPage() {
                 average: parseFloat(average.toFixed(2)),
             };
         }).sort((a, b) => b.average - a.average);
-    }, [selectedClass]);
+    }, [selectedClass, selectedSession, selectedTerm]);
 
     const handlePrint = () => {
         window.print();
     };
+
+    const uniqueSessions = [...new Set(allSessions.map(s => s.name))];
+    const availableTerms = useMemo(() => {
+        if (!selectedSession) return [];
+        return [...new Set(allSessions.filter(s => s.name === selectedSession).map(s => s.term))];
+    }, [selectedSession]);
 
   return (
     <>
@@ -76,10 +86,34 @@ export default function TeacherBroadsheetPage() {
         <CardHeader>
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
             <div>
-              <CardTitle className="font-headline">JSS 3 Broadsheet</CardTitle>
-              <CardDescription>Third Term, 2023/2024 Session</CardDescription>
+              <CardTitle className="font-headline">
+                {selectedClass.toUpperCase()} Broadsheet
+              </CardTitle>
+              <CardDescription>
+                {selectedTerm || 'Select Term'}, {selectedSession || 'Select Session'}
+              </CardDescription>
             </div>
-            <div className="flex gap-4 w-full md:w-auto">
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              <Select onValueChange={setSelectedSession}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Select Session" />
+                </SelectTrigger>
+                <SelectContent>
+                    {uniqueSessions.map(sessionName => (
+                        <SelectItem key={sessionName} value={sessionName}>{sessionName}</SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <Select onValueChange={setSelectedTerm} disabled={!selectedSession}>
+                  <SelectTrigger className="w-full md:w-[180px]">
+                      <SelectValue placeholder="Select Term" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {availableTerms.map(term => (
+                          <SelectItem key={term} value={term}>{term}</SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Select Class" />
@@ -129,3 +163,5 @@ export default function TeacherBroadsheetPage() {
     </>
   );
 }
+
+    

@@ -1,14 +1,17 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Printer } from "lucide-react";
-import { studentProfile, currentResults, performanceData } from "@/lib/data";
+import { studentProfile, currentResults, performanceData, allSessions } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useMemo, useState } from "react";
 
 const getGradeAndRemark = (total: number) => {
   if (total >= 75) return { grade: 'A', remark: 'Excellent', color: 'bg-green-500' };
@@ -19,6 +22,10 @@ const getGradeAndRemark = (total: number) => {
 };
 
 export default function StudentDashboardPage() {
+  const [selectedSession, setSelectedSession] = useState(studentProfile.session);
+  const [selectedTerm, setSelectedTerm] = useState(studentProfile.term);
+  
+  // In a real app, you would fetch results based on selectedSession and selectedTerm
   const processedResults = currentResults.map(r => {
     const total = (r.test1 || 0) + (r.test2 || 0) + (r.test3 || 0) + (r.exam || 0);
     const { grade, remark } = getGradeAndRemark(total);
@@ -27,6 +34,13 @@ export default function StudentDashboardPage() {
 
   const overallTotal = processedResults.reduce((sum, r) => sum + r.total, 0);
   const overallAverage = overallTotal / processedResults.length;
+  
+  const uniqueSessions = [...new Set(allSessions.map(s => s.name))];
+  const availableTerms = useMemo(() => {
+      if (!selectedSession) return [];
+      return [...new Set(allSessions.filter(s => s.name === selectedSession).map(s => s.term))];
+  }, [selectedSession]);
+
 
   return (
     <>
@@ -34,14 +48,36 @@ export default function StudentDashboardPage() {
         title="Student Dashboard"
         description="View your academic performance and results."
       >
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Download PDF
-        </Button>
-        <Button>
-          <Printer className="mr-2 h-4 w-4" />
-          Print Result
-        </Button>
+        <div className="flex flex-wrap gap-2">
+            <Select value={selectedSession} onValueChange={setSelectedSession}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Select Session" />
+                </SelectTrigger>
+                <SelectContent>
+                    {uniqueSessions.map(sessionName => (
+                        <SelectItem key={sessionName} value={sessionName}>{sessionName}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Select value={selectedTerm} onValueChange={setSelectedTerm}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Select Term" />
+                </SelectTrigger>
+                <SelectContent>
+                    {availableTerms.map(term => (
+                        <SelectItem key={term} value={term}>{term}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Button variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Download PDF
+            </Button>
+            <Button>
+              <Printer className="mr-2 h-4 w-4" />
+              Print Result
+            </Button>
+        </div>
       </PageHeader>
       
       <div className="grid gap-8">
@@ -56,8 +92,8 @@ export default function StudentDashboardPage() {
                   </div>
                 </div>
                 <div className="text-left md:text-right">
-                    <p className="font-semibold">{studentProfile.session}</p>
-                    <p className="text-primary font-bold text-lg">{studentProfile.term}</p>
+                    <p className="font-semibold">{selectedSession}</p>
+                    <p className="text-primary font-bold text-lg">{selectedTerm}</p>
                 </div>
              </div>
           </CardHeader>
@@ -127,3 +163,5 @@ export default function StudentDashboardPage() {
     </>
   );
 }
+
+    
