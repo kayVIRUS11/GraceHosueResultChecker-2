@@ -22,12 +22,12 @@ const formSchema = z.object({
   username: z.string().min(1, {
     message: "Username is required.",
   }),
-  accessCode: z.string().min(1, {
-    message: "Scratch card code is required.",
+  password: z.string().min(1, {
+    message: "Password is required.",
   }),
 });
 
-export function StudentLoginForm() {
+export function TeacherLoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -35,27 +35,24 @@ export function StudentLoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      accessCode: "",
+      username: "teacher",
+      password: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
     setTimeout(() => {
-      // In a real app, you would validate the credentials here.
-      // We'll simulate a successful login for a student.
-      if (values.username && values.accessCode) {
+      if (values.username.toLowerCase() === 'teacher' && values.password === 'teacher') {
         toast({
           title: "Login Successful",
-          description: "Redirecting to your dashboard...",
+          description: "Redirecting to teacher dashboard...",
         });
-        router.push("/student/dashboard");
+        router.push("/teacher/dashboard");
       } else {
-         toast({
+        toast({
           title: "Login Failed",
-          description: "Invalid credentials.",
+          description: "Invalid credentials for teacher.",
           variant: "destructive",
         });
       }
@@ -73,7 +70,7 @@ export function StudentLoginForm() {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., johndoe" {...field} />
+                <Input placeholder="e.g., jsmith" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -81,12 +78,12 @@ export function StudentLoginForm() {
         />
         <FormField
           control={form.control}
-          name="accessCode"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Scratch Card Code</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter your access code" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

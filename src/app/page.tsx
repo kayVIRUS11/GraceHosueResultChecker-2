@@ -1,6 +1,7 @@
 import { StudentLoginForm } from "@/components/auth/student-login-form";
 import Logo from "@/components/logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -18,7 +19,16 @@ export default function Home() {
             <StudentLoginForm />
           </CardContent>
         </Card>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <div className="mt-4 text-center text-xs text-muted-foreground">
+            <Link href="/admin/login" className="hover:text-primary">
+                Admin Login
+            </Link>
+            {' | '}
+            <Link href="/teacher/login" className="hover:text-primary">
+                Staff Login
+            </Link>
+        </div>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} MeritMark. All rights reserved.
         </p>
       </div>
