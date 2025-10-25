@@ -41,7 +41,6 @@ import {
 import { MoreHorizontal, PlusCircle, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { allStudents as initialStudents, type Student } from "@/lib/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -108,7 +107,7 @@ export function StudentActions() {
 
   const handleAddStudent = (data: StudentFormData) => {
     const newStudent: Student = {
-      id: Math.max(...students.map((s) => s.id)) + 1,
+      id: Math.max(0, ...students.map((s) => s.id)) + 1,
       ...data,
     };
     setStudents((prev) => [newStudent, ...prev]);
@@ -188,17 +187,7 @@ export function StudentActions() {
               {students.map((student) => (
                 <TableRow key={student.id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage
-                          src={`https://picsum.photos/seed/student${student.id}/100/100`}
-                          alt="Avatar"
-                          data-ai-hint="person portrait"
-                        />
-                        <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {student.name}
-                    </div>
+                    {student.name}
                   </TableCell>
                   <TableCell>{student.regNumber}</TableCell>
                   <TableCell>{student.class}</TableCell>
@@ -284,7 +273,7 @@ export function StudentActions() {
                   <FormItem>
                     <FormLabel>Registration Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="MM-2024-00X" {...field} readOnly={isAddDialogOpen} />
+                      <Input placeholder="GHS00124" {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

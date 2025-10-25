@@ -12,7 +12,6 @@ export const studentProfile = {
   class: "JSS 3",
   session: "2023/2024",
   term: "Third Term",
-  photoUrl: "https://picsum.photos/seed/student1/200/200",
 };
 
 export const currentResults = [

@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User, Settings, LayoutDashboard } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import Link from "next/link";
@@ -19,7 +19,6 @@ type AppHeaderProps = {
   user: {
     name: string;
     role: "Student" | "Teacher" | "Admin";
-    avatarUrl: string;
     dashboardUrl: string;
   };
 };
@@ -39,7 +38,6 @@ export function AppHeader({ user }: AppHeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person portrait" />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>

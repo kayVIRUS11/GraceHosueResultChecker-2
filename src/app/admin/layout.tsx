@@ -20,7 +20,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const user = {
     name: "Admin User",
     role: "Admin" as const,
-    avatarUrl: "https://picsum.photos/seed/admin1/100/100",
     dashboardUrl: "/admin/dashboard",
   };
   return (

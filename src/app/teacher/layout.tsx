@@ -15,7 +15,6 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
   const user = {
     name: "Jane Smith",
     role: "Teacher" as const,
-    avatarUrl: "https://picsum.photos/seed/teacher1/100/100",
     dashboardUrl: "/teacher/dashboard",
   };
   return (

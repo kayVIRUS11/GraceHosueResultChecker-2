@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { allStudents, currentResults } from "@/lib/data";
 import { Download, Printer } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 const subjects = [...new Set(currentResults.map(r => r.subject))];
 
@@ -20,9 +20,17 @@ const getGrade = (total: number) => {
 };
 
 export default function TeacherBroadsheetPage() {
+    const [selectedClass, setSelectedClass] = useState("jss3");
     
     const broadsheetData = useMemo(() => {
-        return allStudents.filter(s => s.class.startsWith("JSS 3")).map(student => {
+        const classMap: Record<string, string> = {
+            "jss1": "JSS 1",
+            "jss2": "JSS 2",
+            "jss3": "JSS 3",
+        };
+        const currentClass = classMap[selectedClass] || "JSS 3";
+
+        return allStudents.filter(s => s.class.startsWith(currentClass)).map(student => {
             const studentScores: Record<string, number> = {};
             let totalScore = 0;
             
@@ -43,7 +51,11 @@ export default function TeacherBroadsheetPage() {
                 average: parseFloat(average.toFixed(2)),
             };
         }).sort((a, b) => b.average - a.average);
-    }, []);
+    }, [selectedClass]);
+
+    const handlePrint = () => {
+        window.print();
+    };
 
   return (
     <>
@@ -51,11 +63,11 @@ export default function TeacherBroadsheetPage() {
         title="Class Broadsheet"
         description="View the full academic broadsheet for a selected class."
       >
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => alert("Downloading broadsheet...")}>
           <Download className="mr-2 h-4 w-4" />
           Download
         </Button>
-        <Button>
+        <Button onClick={handlePrint}>
           <Printer className="mr-2 h-4 w-4" />
           Print
         </Button>
@@ -68,7 +80,7 @@ export default function TeacherBroadsheetPage() {
               <CardDescription>Third Term, 2023/2024 Session</CardDescription>
             </div>
             <div className="flex gap-4 w-full md:w-auto">
-              <Select defaultValue="jss3">
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Select Class" />
                 </SelectTrigger>
@@ -81,13 +93,13 @@ export default function TeacherBroadsheetPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="sticky left-0 bg-background z-10">Student Name</TableHead>
                 {subjects.map(subject => (
-                    <TableHead key={subject} className="text-center whitespace-nowrap">{subject}</TableHead>
+                    <TableHead key={subject} className="text-center whitespace-nowrap px-4">{subject}</TableHead>
                 ))}
                 <TableHead className="text-center font-bold">Total</TableHead>
                 <TableHead className="text-center font-bold">Average</TableHead>

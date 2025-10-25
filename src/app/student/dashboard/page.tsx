@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Printer } from "lucide-react";
-import Image from "next/image";
 import { studentProfile, currentResults, performanceData } from "@/lib/data";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -48,18 +47,15 @@ export default function StudentDashboardPage() {
       <div className="grid gap-8">
         <Card className="shadow-md">
           <CardHeader className="bg-muted/30 p-4 md:p-6">
-             <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+             <div className="flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0">
                 <div className="flex items-center gap-4">
-                  <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-full overflow-hidden border-2 border-primary">
-                      <Image src={studentProfile.photoUrl} alt={studentProfile.name} layout="fill" objectFit="cover" data-ai-hint="person portrait"/>
-                  </div>
                   <div>
                       <h2 className="text-2xl font-bold font-headline">{studentProfile.name}</h2>
                       <p className="text-muted-foreground">{studentProfile.regNumber}</p>
                       <p className="text-muted-foreground">{studentProfile.class}</p>
                   </div>
                 </div>
-                <div className="text-center md:text-right">
+                <div className="text-left md:text-right">
                     <p className="font-semibold">{studentProfile.session}</p>
                     <p className="text-primary font-bold text-lg">{studentProfile.term}</p>
                 </div>
