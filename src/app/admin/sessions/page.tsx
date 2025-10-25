@@ -1,24 +1,14 @@
 import { PageHeader } from "@/components/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SessionActions } from "@/components/admin/session-actions";
 
 export default function AdminSessionsPage() {
   return (
     <>
       <PageHeader
         title="Manage Sessions"
-        description="This feature is coming soon."
+        description="Create, view, and manage academic sessions and terms."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Under Construction</CardTitle>
-          <CardDescription>
-            The ability to manage academic sessions and terms is being developed.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Check back later for updates!</p>
-        </CardContent>
-      </Card>
+      <SessionActions />
     </>
   );
 }

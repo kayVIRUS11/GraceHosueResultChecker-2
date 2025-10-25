@@ -14,6 +14,13 @@ export type Staff = {
   status: string;
 };
 
+export type Session = {
+  id: number;
+  name: string;
+  term: string;
+  status: "Active" | "Inactive" | "Completed";
+};
+
 
 export const studentProfile = {
   name: "John Doe",
@@ -64,6 +71,13 @@ export const allStaff: Staff[] = [
     { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active" },
     { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave" },
     { id: 4, name: "David Green", staffId: "STF00424", role: "Principal", status: "Active" },
+];
+
+export const allSessions: Session[] = [
+    { id: 1, name: "2023/2024", term: "First Term", status: "Completed" },
+    { id: 2, name: "2023/2024", term: "Second Term", status: "Completed" },
+    { id: 3, name: "2023/2024", term: "Third Term", status: "Active" },
+    { id: 4, name: "2024/2025", term: "First Term", status: "Inactive" },
 ];
 
 
