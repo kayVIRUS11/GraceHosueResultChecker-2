@@ -6,6 +6,15 @@ export type Student = {
   status: string;
 };
 
+export type Staff = {
+  id: number;
+  name: string;
+  staffId: string;
+  role: string;
+  status: string;
+};
+
+
 export const studentProfile = {
   name: "John Doe",
   regNumber: "MM-2024-001",
@@ -41,14 +50,22 @@ export const studentsForTeacher = [
 ];
 
 export const allStudents: Student[] = [
-    { id: 1, name: "John Doe", regNumber: "MM-2024-001", class: "JSS 3A", status: "Active" },
-    { id: 2, name: "Alice Johnson", regNumber: "MM-2024-002", class: "JSS 3A", status: "Active" },
-    { id: 3, name: "Bob Williams", regNumber: "MM-2024-003", class: "JSS 3A", status: "Active" },
-    { id: 4, name: "Charlie Brown", regNumber: "MM-2024-004", class: "JSS 3B", status: "Suspended" },
-    { id: 5, name: "Diana Miller", regNumber: "MM-2024-005", class: "JSS 3B", status: "Active" },
-    { id: 6, name: "Ethan Davis", regNumber: "MM-2024-006", class: "SSS 1A", status: "Graduated" },
-    { id: 7, name: "Fiona Garcia", regNumber: "MM-2024-007", class: "SSS 1A", status: "Active" },
+    { id: 1, name: "John Doe", regNumber: "GHS00124", class: "JSS 3A", status: "Active" },
+    { id: 2, name: "Alice Johnson", regNumber: "GHS00224", class: "JSS 3A", status: "Active" },
+    { id: 3, name: "Bob Williams", regNumber: "GHS00324", class: "JSS 3A", status: "Active" },
+    { id: 4, name: "Charlie Brown", regNumber: "GHS00424", class: "JSS 3B", status: "Suspended" },
+    { id: 5, name: "Diana Miller", regNumber: "GHS00524", class: "JSS 3B", status: "Active" },
+    { id: 6, name: "Ethan Davis", regNumber: "GHS00624", class: "SSS 1A", status: "Graduated" },
+    { id: 7, name: "Fiona Garcia", regNumber: "GHS00724", class: "SSS 1A", status: "Active" },
 ];
+
+export const allStaff: Staff[] = [
+    { id: 1, name: "Jane Smith", staffId: "STF00124", role: "Teacher", status: "Active" },
+    { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active" },
+    { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave" },
+    { id: 4, name: "David Green", staffId: "STF00424", role: "Principal", status: "Active" },
+];
+
 
 export const classReportData = {
     className: "JSS 3A",
