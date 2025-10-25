@@ -19,11 +19,8 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  username: z.string().min(1, {
-    message: "Username is required.",
-  }),
-  password: z.string().min(1, {
-    message: "Password is required.",
+  accessCode: z.string().min(1, {
+    message: "Scratch card code is required.",
   }),
 });
 
@@ -35,15 +32,15 @@ export function TeacherLoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "teacher",
-      password: "",
+      accessCode: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setTimeout(() => {
-      if (values.username.toLowerCase() === 'teacher' && values.password === 'teacher') {
+      // In a real app, you would validate the scratch card code here.
+      if (values.accessCode.toLowerCase() === 'teacherpass') {
         toast({
           title: "Login Successful",
           description: "Redirecting to teacher dashboard...",
@@ -52,7 +49,7 @@ export function TeacherLoginForm() {
       } else {
         toast({
           title: "Login Failed",
-          description: "Invalid credentials for teacher.",
+          description: "Invalid scratch card code.",
           variant: "destructive",
         });
       }
@@ -65,25 +62,12 @@ export function TeacherLoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="username"
+          name="accessCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Scratch Card Code</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., jsmith" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder="Enter your access code" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
