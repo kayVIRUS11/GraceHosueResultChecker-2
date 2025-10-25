@@ -1,3 +1,11 @@
+export type Student = {
+  id: number;
+  name: string;
+  regNumber: string;
+  class: string;
+  status: string;
+};
+
 export const studentProfile = {
   name: "John Doe",
   regNumber: "MM-2024-001",
@@ -33,7 +41,7 @@ export const studentsForTeacher = [
     { id: 5, name: "Ethan Davis", reg: "MM-2024-006", scores: { test1: 19, test2: 18, test3: 11, exam: 52 } },
 ];
 
-export const allStudents = [
+export const allStudents: Student[] = [
     { id: 1, name: "John Doe", regNumber: "MM-2024-001", class: "JSS 3A", status: "Active" },
     { id: 2, name: "Alice Johnson", regNumber: "MM-2024-002", class: "JSS 3A", status: "Active" },
     { id: 3, name: "Bob Williams", regNumber: "MM-2024-003", class: "JSS 3A", status: "Active" },
