@@ -84,6 +84,14 @@ export function StudentActions() {
       status: "Active",
     },
   });
+  
+  const generateRegNumber = () => {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const newStudentId = Math.max(0, ...students.map((s) => s.id)) + 1;
+    const paddedId = newStudentId.toString().padStart(3, '0');
+    return `GHS${paddedId}${year}`;
+  };
+
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -135,6 +143,16 @@ export function StudentActions() {
     });
     setIsEditDialogOpen(true);
   };
+  
+  const openAddDialog = () => {
+    form.reset({
+        name: "",
+        regNumber: generateRegNumber(),
+        class: "",
+        status: "Active",
+    });
+    setIsAddDialogOpen(true);
+  };
 
   const openViewDialog = (student: Student) => {
     setSelectedStudent(student);
@@ -144,7 +162,7 @@ export function StudentActions() {
   return (
     <>
       <div className="mb-4 flex justify-end">
-        <Button onClick={() => { form.reset(); setIsAddDialogOpen(true); }}>
+        <Button onClick={openAddDialog}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Student
         </Button>
@@ -266,7 +284,7 @@ export function StudentActions() {
                   <FormItem>
                     <FormLabel>Registration Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="MM-2024-00X" {...field} />
+                      <Input placeholder="MM-2024-00X" {...field} readOnly={isAddDialogOpen} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
