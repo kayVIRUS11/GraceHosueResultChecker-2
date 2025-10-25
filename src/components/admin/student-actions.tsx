@@ -339,7 +339,7 @@ export function StudentActions() {
             <div className="space-y-2">
                 <p><strong>Registration No:</strong> {selectedStudent?.regNumber}</p>
                 <p><strong>Class:</strong> {selectedStudent?.class}</p>
-                <p><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStudent?.status ?? '')}>{selectedStudent?.status}</Badge></p>
+                <div className="flex items-center gap-2"><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStudent?.status ?? '')}>{selectedStudent?.status}</Badge></div>
             </div>
             <DialogFooter>
                 <Button onClick={() => setIsViewDialogOpen(false)}>Close</Button>

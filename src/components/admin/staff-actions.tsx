@@ -339,7 +339,7 @@ export function StaffActions() {
             <div className="space-y-2">
                 <p><strong>Staff ID:</strong> {selectedStaff?.staffId}</p>
                 <p><strong>Role:</strong> {selectedStaff?.role}</p>
-                <p><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStaff?.status ?? '')}>{selectedStaff?.status}</Badge></p>
+                <div className="flex items-center gap-2"><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStaff?.status ?? '')}>{selectedStaff?.status}</Badge></div>
             </div>
             <DialogFooter>
                 <Button onClick={() => setIsViewDialogOpen(false)}>Close</Button>
