@@ -19,11 +19,11 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  registrationNumber: z.string().min(1, {
-    message: "Registration number is required.",
+  username: z.string().min(1, {
+    message: "Username is required.",
   }),
   accessCode: z.string().min(1, {
-    message: "Scratch card access code is required.",
+    message: "Scratch card code is required.",
   }),
 });
 
@@ -35,7 +35,7 @@ export function StudentLoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      registrationNumber: "",
+      username: "",
       accessCode: "",
     },
   });
@@ -50,11 +50,10 @@ export function StudentLoginForm() {
         title: "Login Successful",
         description: "Redirecting to your dashboard...",
       });
-      router.push("/student/dashboard");
       // Simulate login for other roles for easy testing
-      if (values.registrationNumber.toLowerCase() === 'admin') {
+      if (values.username.toLowerCase() === 'admin') {
         router.push("/admin/dashboard");
-      } else if (values.registrationNumber.toLowerCase() === 'teacher') {
+      } else if (values.username.toLowerCase() === 'teacher') {
         router.push("/teacher/dashboard");
       } else {
         router.push("/student/dashboard");
@@ -68,12 +67,12 @@ export function StudentLoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="registrationNumber"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Registration Number</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., MM-2024-001" {...field} />
+                <Input placeholder="e.g., johndoe" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -84,7 +83,7 @@ export function StudentLoginForm() {
           name="accessCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Scratch Card (Access Code)</FormLabel>
+              <FormLabel>Scratch Card Code</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="Enter your access code" {...field} />
               </FormControl>
