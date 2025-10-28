@@ -19,16 +19,16 @@ type Score = { test1: number | null, test2: number | null, test3: number | null,
 // Store scores in a nested structure: { [sessionTermKey]: { [studentId]: Score } }
 type AllScores = Record<string, Record<number, Score>>;
 
+const activeSession = allSessions.find(s => s.status === "Active");
+
 export default function TeacherScoresPage() {
     const [allScores, setAllScores] = useState<AllScores>({});
-    const [selectedSession, setSelectedSession] = useState<string | null>(null);
-    const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
     const [selectedClass, setSelectedClass] = useState("jss3a");
     const [selectedSubject, setSelectedSubject] = useState("math");
 
     const { toast } = useToast();
     
-    const sessionTermKey = selectedSession && selectedTerm ? `${selectedSession}-${selectedTerm}` : null;
+    const sessionTermKey = activeSession ? `${activeSession.name}-${activeSession.term}` : null;
 
     const scores = useMemo(() => {
         if (!sessionTermKey) return {};
@@ -39,8 +39,8 @@ export default function TeacherScoresPage() {
     const handleScoreChange = (studentId: number, field: keyof Score, value: string) => {
         if (!sessionTermKey) {
             toast({
-                title: "Selection Required",
-                description: "Please select a session and term first.",
+                title: "No Active Session",
+                description: "There is no active session available for score entry.",
                 variant: "destructive",
             });
             return;
@@ -99,21 +99,14 @@ export default function TeacherScoresPage() {
     const handleSaveDraft = () => {
         if (!sessionTermKey) return;
         console.log("Saving draft for", sessionTermKey, scores);
-        toast({ title: "Draft Saved", description: `Scores for ${selectedTerm}, ${selectedSession} have been saved as a draft.` });
+        toast({ title: "Draft Saved", description: `Scores for ${activeSession?.term}, ${activeSession?.name} have been saved as a draft.` });
     };
 
     const handleSubmitScores = () => {
         if (!sessionTermKey) return;
         console.log("Submitting scores for", sessionTermKey, scores);
-        toast({ title: "Scores Submitted", description: `Final scores for ${selectedTerm}, ${selectedSession} have been submitted.` });
+        toast({ title: "Scores Submitted", description: `Final scores for ${activeSession?.term}, ${activeSession?.name} have been submitted.` });
     };
-
-    const availableTerms = useMemo(() => {
-        if (!selectedSession) return [];
-        return [...new Set(allSessions.filter(s => s.name === selectedSession).map(s => s.term))];
-    }, [selectedSession]);
-    
-    const uniqueSessions = [...new Set(allSessions.map(s => s.name))];
 
 
   return (
@@ -127,28 +120,29 @@ export default function TeacherScoresPage() {
             <CardHeader>
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div>
-                        <CardTitle className="font-headline">Class Scores</CardTitle>
-                        <CardDescription>Select a session, term, class, and subject to begin.</CardDescription>
+                        <CardTitle className="font-headline">Class Scores for Active Term</CardTitle>
+                        <CardDescription>
+                            {activeSession 
+                                ? `You are entering scores for ${activeSession.term}, ${activeSession.name}.`
+                                : "There is no active session. Please contact the administrator."
+                            }
+                        </CardDescription>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                        <Select onValueChange={setSelectedSession}>
+                        <Select value={activeSession?.name} disabled>
                             <SelectTrigger className="w-full md:w-[180px]">
-                                <SelectValue placeholder="Select Session" />
+                                <SelectValue placeholder="Active Session" />
                             </SelectTrigger>
                             <SelectContent>
-                                {uniqueSessions.map(sessionName => (
-                                    <SelectItem key={sessionName} value={sessionName}>{sessionName}</SelectItem>
-                                ))}
+                                {activeSession && <SelectItem value={activeSession.name}>{activeSession.name}</SelectItem>}
                             </SelectContent>
                         </Select>
-                        <Select onValueChange={setSelectedTerm} disabled={!selectedSession}>
+                         <Select value={activeSession?.term} disabled>
                             <SelectTrigger className="w-full md:w-[180px]">
-                                <SelectValue placeholder="Select Term" />
+                                <SelectValue placeholder="Active Term" />
                             </SelectTrigger>
                             <SelectContent>
-                                {availableTerms.map(term => (
-                                    <SelectItem key={term} value={term}>{term}</SelectItem>
-                                ))}
+                                {activeSession && <SelectItem value={activeSession.term}>{activeSession.term}</SelectItem>}
                             </SelectContent>
                         </Select>
                         <Select value={selectedClass} onValueChange={setSelectedClass}>
