@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { allStudents, currentResults, allSessions } from "@/lib/data";
 import { Download, Printer } from "lucide-react";
 import { useMemo, useState } from "react";
+import TeacherDashboardLayout from "../dashboard/layout";
 
 const subjects = [...new Set(currentResults.map(r => r.subject))];
 
@@ -68,7 +69,7 @@ export default function TeacherBroadsheetPage() {
     }, [selectedSession]);
 
   return (
-    <>
+    <TeacherDashboardLayout>
       <PageHeader
         title="Class Broadsheet"
         description="View the full academic broadsheet for a selected class."
@@ -160,7 +161,7 @@ export default function TeacherBroadsheetPage() {
           </Table>
         </CardContent>
       </Card>
-    </>
+    </TeacherDashboardLayout>
   );
 }
 

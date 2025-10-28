@@ -1,9 +1,10 @@
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import AdminDashboardLayout from "../dashboard/layout";
 
 export default function AdminScratchCardsPage() {
   return (
-    <>
+    <AdminDashboardLayout>
       <PageHeader
         title="Manage Scratch Cards"
         description="This feature is coming soon."
@@ -19,6 +20,6 @@ export default function AdminScratchCardsPage() {
           <p>Check back later for updates!</p>
         </CardContent>
       </Card>
-    </>
+    </AdminDashboardLayout>
   );
 }
