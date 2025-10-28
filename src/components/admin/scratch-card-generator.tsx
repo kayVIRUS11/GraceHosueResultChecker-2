@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -10,23 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,43 +21,38 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-import { MoreHorizontal, PlusCircle, Trash, Copy, Download } from "lucide-react";
+import { RefreshCw, Trash, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { initialScratchCards, type ScratchCard } from "@/lib/data";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { allStudents as initialStudents, allStaff as initialStaff, type Student, type Staff, type ScratchCardDisplay } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "../ui/checkbox";
 
-const generateFormSchema = z.object({
-  count: z.coerce.number().min(1, "Must generate at least 1 card.").max(100, "Cannot generate more than 100 cards at a time."),
-});
-
-type GenerateFormData = z.infer<typeof generateFormSchema>;
+const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
 
 export function ScratchCardGenerator() {
-  const [cards, setCards] = useState<ScratchCard[]>(initialScratchCards);
-  const [selectedCards, setSelectedCards] = useState<number[]>([]);
-  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [staff, setStaff] = useState<Staff[]>(initialStaff);
+  const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const form = useForm<GenerateFormData>({
-    resolver: zodResolver(generateFormSchema),
-    defaultValues: {
-      count: 10,
-    },
-  });
+  const allCards: ScratchCardDisplay[] = useMemo(() => {
+    const studentCards = students.map(s => ({
+        id: `student-${s.id}`,
+        pin: s.scratchCardPin,
+        status: "Not Used" as const, // Assuming status logic would be more complex in a real app
+        assignedTo: s.name,
+        role: "Student" as const,
+    }));
+    const staffCards = staff.map(s => ({
+        id: `staff-${s.id}`,
+        pin: s.scratchCardPin,
+        status: "Not Used" as const,
+        assignedTo: s.name,
+        role: "Staff" as const,
+    }));
+    return [...studentCards, ...staffCards];
+  }, [students, staff]);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -87,48 +65,26 @@ export function ScratchCardGenerator() {
     }
   };
 
-  const generatePins = (count: number): string[] => {
-    const pins: string[] = [];
-    for (let i = 0; i < count; i++) {
-        const pin = `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
-        pins.push(pin);
-    }
-    return pins;
-  };
-
-  const handleGenerateCards = (data: GenerateFormData) => {
-    const newPins = generatePins(data.count);
-    const newCards: ScratchCard[] = newPins.map((pin, i) => ({
-      id: Math.max(0, ...cards.map(c => c.id), ...initialScratchCards.map(c => c.id)) + i + 1,
-      pin,
-      status: "Not Used",
-      createdAt: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-    }));
-
-    setCards(prev => [...newCards, ...prev]);
-    toast({ title: "Cards Generated", description: `${data.count} new scratch cards have been created.` });
-    setIsGenerateDialogOpen(false);
-    form.reset();
-  };
-
-  const handleDeleteCard = (cardId: number) => {
-    setCards(prev => prev.filter(c => c.id !== cardId));
-    toast({ title: "Card Deleted", description: "The scratch card has been removed.", variant: "destructive" });
+  const handleRegenerateAll = () => {
+    setStudents(prev => prev.map(s => ({ ...s, scratchCardPin: generatePin() })));
+    setStaff(prev => prev.map(s => ({ ...s, scratchCardPin: generatePin() })));
+    toast({ title: "All PINs Regenerated", description: "All scratch card PINs for students and staff have been reset." });
   };
   
   const handleDeleteSelected = () => {
-    setCards(prev => prev.filter(c => !selectedCards.includes(c.id)));
-    toast({ title: "Cards Deleted", description: `${selectedCards.length} cards have been removed.`, variant: "destructive" });
+    // In a real app, this would be more complex.
+    // For this mock, we'll just show a toast as we can't "delete" a PIN from a user.
+    toast({ title: "Action Not Supported", description: "To remove a card, regenerate the user's PIN or delete the user.", variant: "destructive" });
     setSelectedCards([]);
   };
 
-  const handleSelectCard = (cardId: number) => {
+  const handleSelectCard = (cardId: string) => {
     setSelectedCards(prev => prev.includes(cardId) ? prev.filter(id => id !== cardId) : [...prev, cardId]);
   };
   
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-        setSelectedCards(cards.map(c => c.id));
+        setSelectedCards(allCards.map(c => c.id));
     } else {
         setSelectedCards([]);
     }
@@ -138,21 +94,6 @@ export function ScratchCardGenerator() {
     navigator.clipboard.writeText(text);
     toast({title: "Copied to clipboard"});
   };
-
-  const downloadSelected = () => {
-    const selectedData = cards.filter(c => selectedCards.includes(c.id));
-    const csvContent = "data:text/csv;charset=utf-8," 
-        + "PIN,Status,Date Generated\n" 
-        + selectedData.map(c => `${c.pin},${c.status},${c.createdAt}`).join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "scratch_cards.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
 
   return (
     <>
@@ -180,22 +121,34 @@ export function ScratchCardGenerator() {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                    <Button variant="outline" size="sm" onClick={downloadSelected}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                    </Button>
                 </div>
             )}
         </div>
-        <Button onClick={() => setIsGenerateDialogOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Generate New Cards
-        </Button>
+         <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Regenerate All PINs
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This will regenerate scratch card PINs for ALL students and staff. This action cannot be undone and will invalidate all existing PINs.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleRegenerateAll}>Yes, Regenerate All</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Generated Scratch Cards</CardTitle>
-          <CardDescription>A list of all generated result-checker PINs.</CardDescription>
+          <CardTitle>Scratch Card Hub</CardTitle>
+          <CardDescription>A consolidated list of all scratch cards assigned to users.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -203,20 +156,18 @@ export function ScratchCardGenerator() {
               <TableRow>
                 <TableHead padding="checkbox">
                     <Checkbox
-                        checked={selectedCards.length === cards.length && cards.length > 0}
+                        checked={selectedCards.length === allCards.length && allCards.length > 0}
                         onCheckedChange={handleSelectAll}
                     />
                 </TableHead>
                 <TableHead>Card PIN</TableHead>
+                <TableHead>Assigned To</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Date Generated</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cards.map((card) => (
+              {allCards.map((card) => (
                 <TableRow key={card.id}>
                   <TableCell padding="checkbox">
                     <Checkbox
@@ -230,49 +181,12 @@ export function ScratchCardGenerator() {
                         <Copy className="h-3 w-3" />
                     </Button>
                   </TableCell>
+                   <TableCell>{card.assignedTo}</TableCell>
+                   <TableCell>{card.role}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(card.status)}>
                       {card.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>{card.createdAt}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => copyToClipboard(card.pin)}>Copy PIN</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
-                                    Delete
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete the scratch card.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteCard(card.id)}>Delete</AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -280,41 +194,6 @@ export function ScratchCardGenerator() {
           </Table>
         </CardContent>
       </Card>
-      
-      {/* Generate Dialog */}
-      <Dialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Generate Cards</DialogTitle>
-            <DialogDescription>
-              Specify how many scratch cards you want to create.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleGenerateCards)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="count"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of Cards</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="e.g., 50" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <DialogClose asChild>
-                    <Button type="button" variant="secondary">Cancel</Button>
-                </DialogClose>
-                <Button type="submit">Generate</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

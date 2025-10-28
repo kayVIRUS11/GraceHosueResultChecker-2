@@ -38,7 +38,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-import { MoreHorizontal, PlusCircle, User } from "lucide-react";
+import { MoreHorizontal, PlusCircle, User, RefreshCw, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { allStudents as initialStudents, type Student } from "@/lib/data";
@@ -62,9 +62,12 @@ const studentFormSchema = z.object({
   regNumber: z.string().min(1, "Registration number is required"),
   class: z.string().min(1, "Class is required"),
   status: z.enum(["Active", "Suspended", "Graduated"]),
+  scratchCardPin: z.string(),
 });
 
 type StudentFormData = z.infer<typeof studentFormSchema>;
+
+const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
 
 export function StudentActions() {
   const [students, setStudents] = useState<Student[]>(initialStudents);
@@ -81,6 +84,7 @@ export function StudentActions() {
       regNumber: "",
       class: "",
       status: "Active",
+      scratchCardPin: "",
     },
   });
   
@@ -109,6 +113,7 @@ export function StudentActions() {
     const newStudent: Student = {
       id: Math.max(0, ...students.map((s) => s.id)) + 1,
       ...data,
+      scratchCardPin: generatePin(), // Also generate PIN on add
     };
     setStudents((prev) => [newStudent, ...prev]);
     toast({ title: "Student Added", description: `${data.name} has been successfully added.` });
@@ -131,6 +136,15 @@ export function StudentActions() {
     setStudents((prev) => prev.filter((s) => s.id !== studentId));
     toast({ title: "Student Deleted", description: "The student has been removed." , variant: "destructive"});
   };
+  
+  const handleRegeneratePin = (studentId: number) => {
+    setStudents(prev => 
+        prev.map(student => 
+            student.id === studentId ? {...student, scratchCardPin: generatePin()} : student
+        )
+    );
+    toast({ title: "PIN Regenerated", description: "The student's scratch card PIN has been updated." });
+  };
 
   const openEditDialog = (student: Student) => {
     setSelectedStudent(student);
@@ -139,6 +153,7 @@ export function StudentActions() {
         regNumber: student.regNumber,
         class: student.class,
         status: student.status as "Active" | "Suspended" | "Graduated",
+        scratchCardPin: student.scratchCardPin,
     });
     setIsEditDialogOpen(true);
   };
@@ -149,6 +164,7 @@ export function StudentActions() {
         regNumber: generateRegNumber(),
         class: "",
         status: "Active",
+        scratchCardPin: generatePin(),
     });
     setIsAddDialogOpen(true);
   };
@@ -156,6 +172,11 @@ export function StudentActions() {
   const openViewDialog = (student: Student) => {
     setSelectedStudent(student);
     setIsViewDialogOpen(true);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({title: "Copied to clipboard"});
   };
 
   return (
@@ -176,6 +197,7 @@ export function StudentActions() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Registration No.</TableHead>
+                <TableHead>Scratch Card PIN</TableHead>
                 <TableHead>Class</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>
@@ -190,6 +212,12 @@ export function StudentActions() {
                     {student.name}
                   </TableCell>
                   <TableCell>{student.regNumber}</TableCell>
+                  <TableCell className="font-mono flex items-center gap-2">
+                    {student.scratchCardPin}
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(student.scratchCardPin)}>
+                        <Copy className="h-3 w-3" />
+                    </Button>
+                  </TableCell>
                   <TableCell>{student.class}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(student.status)}>
@@ -212,6 +240,9 @@ export function StudentActions() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => openEditDialog(student)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openViewDialog(student)}>View Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRegeneratePin(student.id)}>
+                            <RefreshCw className="mr-2 h-4 w-4" /> Regenerate PIN
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -279,6 +310,19 @@ export function StudentActions() {
                   </FormItem>
                 )}
               />
+               <FormField
+                control={form.control}
+                name="scratchCardPin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Scratch Card PIN</FormLabel>
+                    <FormControl>
+                      <Input {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="class"
@@ -339,6 +383,7 @@ export function StudentActions() {
             <div className="space-y-2">
                 <p><strong>Registration No:</strong> {selectedStudent?.regNumber}</p>
                 <p><strong>Class:</strong> {selectedStudent?.class}</p>
+                <p><strong>Scratch Card PIN:</strong> <span className="font-mono">{selectedStudent?.scratchCardPin}</span></p>
                 <div className="flex items-center gap-2"><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStudent?.status ?? '')}>{selectedStudent?.status}</Badge></div>
             </div>
             <DialogFooter>

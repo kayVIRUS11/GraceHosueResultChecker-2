@@ -38,7 +38,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-import { MoreHorizontal, PlusCircle, User } from "lucide-react";
+import { MoreHorizontal, PlusCircle, User, RefreshCw, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { allStaff as initialStaff, type Staff } from "@/lib/data";
@@ -62,9 +62,13 @@ const staffFormSchema = z.object({
   staffId: z.string().min(1, "Staff ID is required"),
   role: z.string().min(1, "Role is required"),
   status: z.enum(["Active", "On Leave", "Terminated"]),
+  scratchCardPin: z.string(),
 });
 
 type StaffFormData = z.infer<typeof staffFormSchema>;
+
+const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
+
 
 export function StaffActions() {
   const [staff, setStaff] = useState<Staff[]>(initialStaff);
@@ -81,6 +85,7 @@ export function StaffActions() {
       staffId: "",
       role: "",
       status: "Active",
+      scratchCardPin: "",
     },
   });
   
@@ -109,6 +114,7 @@ export function StaffActions() {
     const newStaff: Staff = {
       id: Math.max(0, ...staff.map((s) => s.id)) + 1,
       ...data,
+      scratchCardPin: generatePin(),
     };
     setStaff((prev) => [newStaff, ...prev]);
     toast({ title: "Staff Added", description: `${data.name} has been successfully added.` });
@@ -132,6 +138,15 @@ export function StaffActions() {
     toast({ title: "Staff Deleted", description: "The staff member has been removed." , variant: "destructive"});
   };
 
+  const handleRegeneratePin = (staffMemberId: number) => {
+    setStaff(prev => 
+        prev.map(staffMember => 
+            staffMember.id === staffMemberId ? {...staffMember, scratchCardPin: generatePin()} : staffMember
+        )
+    );
+    toast({ title: "PIN Regenerated", description: "The staff member's scratch card PIN has been updated." });
+  };
+
   const openEditDialog = (staffMember: Staff) => {
     setSelectedStaff(staffMember);
     form.reset({
@@ -139,6 +154,7 @@ export function StaffActions() {
         staffId: staffMember.staffId,
         role: staffMember.role,
         status: staffMember.status as "Active" | "On Leave" | "Terminated",
+        scratchCardPin: staffMember.scratchCardPin,
     });
     setIsEditDialogOpen(true);
   };
@@ -149,6 +165,7 @@ export function StaffActions() {
         staffId: generateStaffId(),
         role: "Teacher",
         status: "Active",
+        scratchCardPin: generatePin(),
     });
     setIsAddDialogOpen(true);
   };
@@ -156,6 +173,11 @@ export function StaffActions() {
   const openViewDialog = (staffMember: Staff) => {
     setSelectedStaff(staffMember);
     setIsViewDialogOpen(true);
+  };
+  
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({title: "Copied to clipboard"});
   };
 
   return (
@@ -176,6 +198,7 @@ export function StaffActions() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Staff ID</TableHead>
+                <TableHead>Scratch Card PIN</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>
@@ -190,6 +213,12 @@ export function StaffActions() {
                     {staffMember.name}
                   </TableCell>
                   <TableCell>{staffMember.staffId}</TableCell>
+                   <TableCell className="font-mono flex items-center gap-2">
+                    {staffMember.scratchCardPin}
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(staffMember.scratchCardPin)}>
+                        <Copy className="h-3 w-3" />
+                    </Button>
+                  </TableCell>
                   <TableCell>{staffMember.role}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(staffMember.status)}>
@@ -212,6 +241,9 @@ export function StaffActions() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => openEditDialog(staffMember)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openViewDialog(staffMember)}>View Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRegeneratePin(staffMember.id)}>
+                            <RefreshCw className="mr-2 h-4 w-4" /> Regenerate PIN
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -279,6 +311,19 @@ export function StaffActions() {
                   </FormItem>
                 )}
               />
+               <FormField
+                control={form.control}
+                name="scratchCardPin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Scratch Card PIN</FormLabel>
+                    <FormControl>
+                      <Input {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="role"
@@ -339,6 +384,7 @@ export function StaffActions() {
             <div className="space-y-2">
                 <p><strong>Staff ID:</strong> {selectedStaff?.staffId}</p>
                 <p><strong>Role:</strong> {selectedStaff?.role}</p>
+                <p><strong>Scratch Card PIN:</strong> <span className="font-mono">{selectedStaff?.scratchCardPin}</span></p>
                 <div className="flex items-center gap-2"><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(selectedStaff?.status ?? '')}>{selectedStaff?.status}</Badge></div>
             </div>
             <DialogFooter>
