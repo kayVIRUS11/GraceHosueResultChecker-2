@@ -30,8 +30,8 @@ import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export function ScratchCardGenerator() {
-  const [students, setStudents] = useState<Student[]>(() => initialStudentsData.map(s => ({ ...s, scratchCardPin: generatePin() })));
-  const [staff, setStaff] = useState<Staff[]>(() => initialStaffData.map(s => ({ ...s, scratchCardPin: generatePin() })));
+  const [students, setStudents] = useState<Student[]>(initialStudentsData);
+  const [staff, setStaff] = useState<Staff[]>(initialStaffData);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -258,5 +258,3 @@ export function ScratchCardGenerator() {
     </>
   );
 }
-
-    

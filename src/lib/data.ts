@@ -69,7 +69,7 @@ export const studentsForTeacher = [
 
 export const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
 
-export const allStudents: Omit<Student, 'scratchCardPin'>[] = [
+const initialStudents: Omit<Student, 'scratchCardPin'>[] = [
     { id: 1, name: "John Doe", regNumber: "GHS00124", class: "JSS 3A", status: "Active" },
     { id: 2, name: "Alice Johnson", regNumber: "GHS00224", class: "JSS 3A", status: "Active" },
     { id: 3, name: "Bob Williams", regNumber: "GHS00324", class: "JSS 3A", status: "Active" },
@@ -79,12 +79,16 @@ export const allStudents: Omit<Student, 'scratchCardPin'>[] = [
     { id: 7, name: "Fiona Garcia", regNumber: "GHS00724", class: "SSS 1A", status: "Active" },
 ];
 
-export const allStaff: Omit<Staff, 'scratchCardPin'>[] = [
+const initialStaff: Omit<Staff, 'scratchCardPin'>[] = [
     { id: 1, name: "Jane Smith", staffId: "STF00124", role: "Teacher", status: "Active" },
     { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active" },
     { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave" },
     { id: 4, name: "David Green", staffId: "STF00424", role: "Principal", status: "Active" },
 ];
+
+export const allStudents: Student[] = initialStudents.map(s => ({...s, scratchCardPin: generatePin()}));
+export const allStaff: Staff[] = initialStaff.map(s => ({...s, scratchCardredPin: generatePin()}));
+
 
 export const allSessions: Session[] = [
     { id: 1, name: "2023/2024", term: "First Term", status: "Completed" },

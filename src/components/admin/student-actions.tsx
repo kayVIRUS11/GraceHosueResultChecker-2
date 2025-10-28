@@ -68,7 +68,7 @@ const studentFormSchema = z.object({
 type StudentFormData = z.infer<typeof studentFormSchema>;
 
 export function StudentActions() {
-  const [students, setStudents] = useState<Student[]>(() => initialStudentsData.map(s => ({...s, scratchCardPin: generatePin()})));
+  const [students, setStudents] = useState<Student[]>(initialStudentsData);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

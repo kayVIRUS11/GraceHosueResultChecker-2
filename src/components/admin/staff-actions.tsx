@@ -68,7 +68,7 @@ const staffFormSchema = z.object({
 type StaffFormData = z.infer<typeof staffFormSchema>;
 
 export function StaffActions() {
-  const [staff, setStaff] = useState<Staff[]>(() => initialStaffData.map(s => ({ ...s, scratchCardPin: generatePin() })));
+  const [staff, setStaff] = useState<Staff[]>(initialStaffData);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
