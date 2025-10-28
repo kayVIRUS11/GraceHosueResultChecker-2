@@ -21,6 +21,13 @@ export type Session = {
   status: "Active" | "Inactive" | "Completed";
 };
 
+export type ScratchCard = {
+  id: number;
+  pin: string;
+  status: "Used" | "Not Used";
+  createdAt: string;
+};
+
 
 export const studentProfile = {
   name: "John Doe",
@@ -78,6 +85,12 @@ export const allSessions: Session[] = [
     { id: 2, name: "2023/2024", term: "Second Term", status: "Completed" },
     { id: 3, name: "2023/2024", term: "Third Term", status: "Active" },
     { id: 4, name: "2024/2025", term: "First Term", status: "Inactive" },
+];
+
+export const initialScratchCards: ScratchCard[] = [
+    { id: 1, pin: "SC-9812-7435-0182", status: "Not Used", createdAt: "2024-07-20" },
+    { id: 2, pin: "SC-5409-6218-9374", status: "Used", createdAt: "2024-07-20" },
+    { id: 3, pin: "SC-3827-0591-4623", status: "Not Used", createdAt: "2024-07-20" },
 ];
 
 

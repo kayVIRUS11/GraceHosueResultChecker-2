@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScratchCardGenerator } from "@/components/admin/scratch-card-generator";
 import AdminDashboardLayout from "../dashboard/layout";
 
 export default function AdminScratchCardsPage() {
@@ -7,19 +7,9 @@ export default function AdminScratchCardsPage() {
     <AdminDashboardLayout>
       <PageHeader
         title="Manage Scratch Cards"
-        description="This feature is coming soon."
+        description="Generate, view, and manage result-checker scratch cards."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Under Construction</CardTitle>
-          <CardDescription>
-            The ability to generate and manage scratch cards is being developed.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Check back later for updates!</p>
-        </CardContent>
-      </Card>
+      <ScratchCardGenerator />
     </AdminDashboardLayout>
   );
 }
