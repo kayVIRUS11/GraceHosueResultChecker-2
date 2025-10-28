@@ -41,7 +41,7 @@ import {
 import { MoreHorizontal, PlusCircle, User, RefreshCw, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { allStaff as initialStaff, type Staff } from "@/lib/data";
+import { allStaff as initialStaffData, type Staff, generatePin } from "@/lib/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -67,11 +67,8 @@ const staffFormSchema = z.object({
 
 type StaffFormData = z.infer<typeof staffFormSchema>;
 
-const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
-
-
 export function StaffActions() {
-  const [staff, setStaff] = useState<Staff[]>(initialStaff);
+  const [staff, setStaff] = useState<Staff[]>(() => initialStaffData.map(s => ({ ...s, scratchCardPin: generatePin() })));
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

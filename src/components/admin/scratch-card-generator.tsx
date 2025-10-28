@@ -24,15 +24,16 @@ import {
 import { RefreshCw, Trash, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { allStudents as initialStudents, allStaff as initialStaff, type Student, type Staff, type ScratchCardDisplay } from "@/lib/data";
+import { allStudents as initialStudentsData, allStaff as initialStaffData, type Student, type Staff, type ScratchCardDisplay, generatePin } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "../ui/checkbox";
 
-const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
+const initialStudents: Student[] = initialStudentsData.map(s => ({ ...s, scratchCardPin: generatePin() }));
+const initialStaff: Staff[] = initialStaffData.map(s => ({ ...s, scratchCardPin: generatePin() }));
 
 export function ScratchCardGenerator() {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
-  const [staff, setStaff] = useState<Staff[]>(initialStaff);
+  const [students, setStudents] = useState<Student[]>(() => initialStudentsData.map(s => ({ ...s, scratchCardPin: generatePin() })));
+  const [staff, setStaff] = useState<Staff[]>(() => initialStaffData.map(s => ({ ...s, scratchCardPin: generatePin() })));
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const { toast } = useToast();
 

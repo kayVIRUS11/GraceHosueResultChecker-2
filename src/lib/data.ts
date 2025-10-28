@@ -67,23 +67,23 @@ export const studentsForTeacher = [
     { id: 5, name: "Ethan Davis", reg: "MM-2024-006", scores: { test1: 19, test2: 18, test3: 11, exam: 52 } },
 ];
 
-const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
+export const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
 
-export const allStudents: Student[] = [
-    { id: 1, name: "John Doe", regNumber: "GHS00124", class: "JSS 3A", status: "Active", scratchCardPin: generatePin() },
-    { id: 2, name: "Alice Johnson", regNumber: "GHS00224", class: "JSS 3A", status: "Active", scratchCardPin: generatePin() },
-    { id: 3, name: "Bob Williams", regNumber: "GHS00324", class: "JSS 3A", status: "Active", scratchCardPin: generatePin() },
-    { id: 4, name: "Charlie Brown", regNumber: "GHS00424", class: "JSS 3B", status: "Suspended", scratchCardPin: generatePin() },
-    { id: 5, name: "Diana Miller", regNumber: "GHS00524", class: "JSS 3B", status: "Active", scratchCardPin: generatePin() },
-    { id: 6, name: "Ethan Davis", regNumber: "GHS00624", class: "SSS 1A", status: "Graduated", scratchCardPin: generatePin() },
-    { id: 7, name: "Fiona Garcia", regNumber: "GHS00724", class: "SSS 1A", status: "Active", scratchCardPin: generatePin() },
+export const allStudents: Omit<Student, 'scratchCardPin'>[] = [
+    { id: 1, name: "John Doe", regNumber: "GHS00124", class: "JSS 3A", status: "Active" },
+    { id: 2, name: "Alice Johnson", regNumber: "GHS00224", class: "JSS 3A", status: "Active" },
+    { id: 3, name: "Bob Williams", regNumber: "GHS00324", class: "JSS 3A", status: "Active" },
+    { id: 4, name: "Charlie Brown", regNumber: "GHS00424", class: "JSS 3B", status: "Suspended" },
+    { id: 5, name: "Diana Miller", regNumber: "GHS00524", class: "JSS 3B", status: "Active" },
+    { id: 6, name: "Ethan Davis", regNumber: "GHS00624", class: "SSS 1A", status: "Graduated" },
+    { id: 7, name: "Fiona Garcia", regNumber: "GHS00724", class: "SSS 1A", status: "Active" },
 ];
 
-export const allStaff: Staff[] = [
-    { id: 1, name: "Jane Smith", staffId: "STF00124", role: "Teacher", status: "Active", scratchCardPin: generatePin() },
-    { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active", scratchCardPin: generatePin() },
-    { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave", scratchCardPin: generatePin() },
-    { id: 4, name: "David Green", staffId: "STF00424", role: "Principal", status: "Active", scratchCardPin: generatePin() },
+export const allStaff: Omit<Staff, 'scratchCardPin'>[] = [
+    { id: 1, name: "Jane Smith", staffId: "STF00124", role: "Teacher", status: "Active" },
+    { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active" },
+    { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave" },
+    { id: 4, name: "David Green", staffId: "STF00424", role: "Principal", status: "Active" },
 ];
 
 export const allSessions: Session[] = [

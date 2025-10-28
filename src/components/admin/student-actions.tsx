@@ -41,7 +41,7 @@ import {
 import { MoreHorizontal, PlusCircle, User, RefreshCw, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { allStudents as initialStudents, type Student } from "@/lib/data";
+import { allStudents as initialStudentsData, type Student, generatePin } from "@/lib/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -67,10 +67,8 @@ const studentFormSchema = z.object({
 
 type StudentFormData = z.infer<typeof studentFormSchema>;
 
-const generatePin = () => `SC-${[...Array(3)].map(() => Math.floor(Math.random() * 9000 + 1000)).join('-')}`;
-
 export function StudentActions() {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students, setStudents] = useState<Student[]>(() => initialStudentsData.map(s => ({...s, scratchCardPin: generatePin()})));
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
