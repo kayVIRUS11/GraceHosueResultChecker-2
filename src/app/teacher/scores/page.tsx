@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { allSessions, studentsForTeacher } from "@/lib/data";
+import { allSessions, studentsForTeacher, allStaff } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Save, Send } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import TeacherDashboardLayout from "../dashboard/layout";
 
@@ -20,13 +20,21 @@ type Score = { test1: number | null, test2: number | null, test3: number | null,
 type AllScores = Record<string, Record<number, Score>>;
 
 const activeSession = allSessions.find(s => s.status === "Active");
+const currentTeacher = allStaff.find(s => s.name === "Jane Smith"); // In a real app, this would come from auth state
 
 export default function TeacherScoresPage() {
     const [allScores, setAllScores] = useState<AllScores>({});
-    const [selectedClass, setSelectedClass] = useState("jss3a");
+    const [selectedClass, setSelectedClass] = useState<string | undefined>(currentTeacher?.assignedClasses?.[0]);
     const [selectedSubject, setSelectedSubject] = useState("math");
 
     const { toast } = useToast();
+    
+    useEffect(() => {
+        // Set default class if not set or if teacher's assignments change
+        if (currentTeacher?.assignedClasses && !selectedClass) {
+            setSelectedClass(currentTeacher.assignedClasses[0]);
+        }
+    }, [currentTeacher, selectedClass]);
     
     const sessionTermKey = activeSession ? `${activeSession.name}-${activeSession.term}` : null;
 
@@ -145,13 +153,14 @@ export default function TeacherScoresPage() {
                                 {activeSession && <SelectItem value={activeSession.term}>{activeSession.term}</SelectItem>}
                             </SelectContent>
                         </Select>
-                        <Select value={selectedClass} onValueChange={setSelectedClass}>
+                        <Select value={selectedClass} onValueChange={setSelectedClass} disabled={!currentTeacher?.assignedClasses}>
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Select Class" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="jss3a">JSS 3A</SelectItem>
-                                <SelectItem value="jss3b">JSS 3B</SelectItem>
+                                {currentTeacher?.assignedClasses?.map(c => (
+                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                         <Select value={selectedSubject} onValueChange={setSelectedSubject}>

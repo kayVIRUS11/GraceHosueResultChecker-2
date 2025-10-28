@@ -14,6 +14,7 @@ export type Staff = {
   role: string;
   status: string;
   scratchCardPin: string;
+  assignedClasses?: string[];
 };
 
 export type Session = {
@@ -79,7 +80,7 @@ const initialStudents: Omit<Student, 'scratchCardPin'>[] = [
     { id: 7, name: "Fiona Garcia", regNumber: "GHS00724", class: "SSS 1A", status: "Active" },
 ];
 
-const initialStaff: Omit<Staff, 'scratchCardPin'>[] = [
+const initialStaff: Omit<Staff, 'scratchCardPin' | 'assignedClasses'>[] = [
     { id: 1, name: "Jane Smith", staffId: "STF00124", role: "Teacher", status: "Active" },
     { id: 2, name: "Peter Jones", staffId: "STF00224", role: "Teacher", status: "Active" },
     { id: 3, name: "Mary White", staffId: "STF00324", role: "Bursar", status: "On Leave" },
@@ -87,7 +88,13 @@ const initialStaff: Omit<Staff, 'scratchCardPin'>[] = [
 ];
 
 export const allStudents: Student[] = initialStudents.map(s => ({...s, scratchCardPin: generatePin()}));
-export const allStaff: Staff[] = initialStaff.map(s => ({...s, scratchCardredPin: generatePin()}));
+
+export const allStaff: Staff[] = [
+    { ...initialStaff[0], scratchCardPin: generatePin(), assignedClasses: ["JSS 3A", "JSS 3B"] },
+    { ...initialStaff[1], scratchCardPin: generatePin(), assignedClasses: ["SSS 1A"] },
+    { ...initialStaff[2], scratchCardPin: generatePin() },
+    { ...initialStaff[3], scratchCardPin: generatePin() },
+];
 
 
 export const allSessions: Session[] = [
