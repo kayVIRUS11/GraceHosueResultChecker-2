@@ -1,4 +1,3 @@
-
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -12,7 +11,6 @@ import { cn } from "@/lib/utils";
 import { Save, Send } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import TeacherDashboardLayout from "../dashboard/layout";
 
 type Score = { test1: number | null, test2: number | null, test3: number | null, exam: number | null };
 
@@ -118,7 +116,7 @@ export default function TeacherScoresPage() {
 
 
   return (
-    <TeacherDashboardLayout>
+    <>
       <PageHeader
         title="Score Entry"
         description="Enter student scores for your assigned class and subject."
@@ -227,8 +225,6 @@ export default function TeacherScoresPage() {
             </Button>
         </div>
       </div>
-    </TeacherDashboardLayout>
+    </>
   );
 }
-
-    

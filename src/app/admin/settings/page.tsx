@@ -1,10 +1,9 @@
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import AdminDashboardLayout from "../dashboard/layout";
 
 export default function AdminSettingsPage() {
   return (
-    <AdminDashboardLayout>
+    <>
       <PageHeader
         title="System Settings"
         description="This feature is coming soon."
@@ -20,6 +19,6 @@ export default function AdminSettingsPage() {
           <p>Check back later for updates!</p>
         </CardContent>
       </Card>
-    </AdminDashboardLayout>
+    </>
   );
 }
