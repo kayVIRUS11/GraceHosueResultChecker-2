@@ -1,4 +1,3 @@
-
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -33,7 +32,7 @@ export default function StudentDashboardPage() {
   });
 
   const overallTotal = processedResults.reduce((sum, r) => sum + r.total, 0);
-  const overallAverage = overallTotal / processedResults.length;
+  const overallAverage = processedResults.length > 0 ? overallTotal / processedResults.length : 0;
   
   const uniqueSessions = [...new Set(allSessions.map(s => s.name))];
   const availableTerms = useMemo(() => {
@@ -59,7 +58,7 @@ export default function StudentDashboardPage() {
                     ))}
                 </SelectContent>
             </Select>
-            <Select value={selectedTerm} onValueChange={setSelectedTerm}>
+            <Select value={selectedTerm} onValueChange={setSelectedTerm} disabled={!selectedSession}>
                 <SelectTrigger className="w-full md:w-[180px]">
                     <SelectValue placeholder="Select Term" />
                 </SelectTrigger>
@@ -105,7 +104,7 @@ export default function StudentDashboardPage() {
                   <TableHead className="text-center">Test 1 (20)</TableHead>
                   <TableHead className="text-center">Test 2 (20)</TableHead>
                   <TableHead className="text-center">Test 3 (20)</TableHead>
-                  <TableHead className="text-center">Exam (60)</TableHead>
+                  <TableHead className="text-center">Exam (40)</TableHead>
                   <TableHead className="text-center">Total (100)</TableHead>
                   <TableHead className="text-center">Grade</TableHead>
                   <TableHead className="text-right">Remark</TableHead>
@@ -163,5 +162,3 @@ export default function StudentDashboardPage() {
     </>
   );
 }
-
-    
